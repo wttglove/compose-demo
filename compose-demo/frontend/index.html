@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            padding: 40px;
+            border-radius: 20px;
+        }
+        button {
+            background: #fff;
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover { background: #f0f0f0; }
+        #response {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 DevOps Multi-Container Demo</h1>
+        <p>Frontend (Nginx) + Backend (Python API)</p>
+        <button onclick="fetchData()">Call API</button>
+        <div id="response"></div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('http://localhost:5001/api/status');
+                const data = await response.json();
+                document.getElementById('response').innerHTML = `
+                    <h3>API Response:</h3>
+                    <p><strong>Message:</strong> ${data.message}</p>
+                    <p><strong>Status:</strong> ${data.status}</p>
+                    <p><strong>Time:</strong> ${data.timestamp}</p>
+                `;
+            } catch (error) {
+                document.getElementById('response').innerHTML = 
+                    `<p style="color: #ff6b6b;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

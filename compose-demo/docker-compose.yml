@@ -1,0 +1,24 @@
+services:
+  # Frontend - Nginx
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  # Backend - Python API
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "5001:5000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
