@@ -1,4 +1,39 @@
 services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: devops_db
+      POSTGRES_USER: devops_user
+      POSTGRES_PASSWORD: devops_pass
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devops_user -d devops_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend - Python API
+  backend:
+    build: ./backend
+    container_name: backend
+    environment:
+      DB_HOST: db
+      DB_NAME: devops_db
+      DB_USER: devops_user
+      DB_PASSWORD: devops_pass
+    ports:
+      - "5001:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
   # Frontend - Nginx
   frontend:
     build: ./frontend
@@ -10,15 +45,9 @@ services:
     networks:
       - app-network
 
-  # Backend - Python API
-  backend:
-    build: ./backend
-    container_name: backend
-    ports:
-      - "5001:5000"
-    networks:
-      - app-network
-
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  db-data:

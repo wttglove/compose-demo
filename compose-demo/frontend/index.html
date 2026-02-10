@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevOps Demo</title>
+    <title>DevOps Demo with Database</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,7 +12,7 @@
             padding: 40px;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: rgba(0,0,0,0.3);
             padding: 40px;
@@ -26,39 +26,82 @@
             font-size: 18px;
             border-radius: 10px;
             cursor: pointer;
-            margin-top: 20px;
+            margin: 10px 5px;
         }
         button:hover { background: #f0f0f0; }
-        #response {
+        .response {
             margin-top: 20px;
             padding: 20px;
             background: rgba(255,255,255,0.1);
             border-radius: 10px;
+        }
+        .visits-list {
+            margin-top: 10px;
+        }
+        .visit-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🚀 DevOps Multi-Container Demo</h1>
-        <p>Frontend (Nginx) + Backend (Python API)</p>
-        <button onclick="fetchData()">Call API</button>
-        <div id="response"></div>
+        <p>Frontend (Nginx) + Backend (Flask) + Database (PostgreSQL)</p>
+        
+        <div>
+            <button onclick="fetchStatus()">Get Status</button>
+            <button onclick="fetchVisits()">Show Visits</button>
+        </div>
+        
+        <div id="status" class="response"></div>
+        <div id="visits" class="response" style="display:none;"></div>
     </div>
 
     <script>
-        async function fetchData() {
+        async function fetchStatus() {
             try {
                 const response = await fetch('http://localhost:5001/api/status');
                 const data = await response.json();
-                document.getElementById('response').innerHTML = `
-                    <h3>API Response:</h3>
+                document.getElementById('status').innerHTML = `
+                    <h3>📊 API Response:</h3>
                     <p><strong>Message:</strong> ${data.message}</p>
                     <p><strong>Status:</strong> ${data.status}</p>
+                    <p><strong>Database:</strong> ${data.database}</p>
+                    <p><strong>Total Visits:</strong> ${data.total_visits}</p>
                     <p><strong>Time:</strong> ${data.timestamp}</p>
                 `;
+                document.getElementById('status').style.display = 'block';
             } catch (error) {
-                document.getElementById('response').innerHTML = 
-                    `<p style="color: #ff6b6b;">Error: ${error.message}</p>`;
+                document.getElementById('status').innerHTML = 
+                    `<p style="color: #ff6b6b;">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        async function fetchVisits() {
+            try {
+                const response = await fetch('http://localhost:5000/api/visits');
+                const data = await response.json();
+                
+                let html = `<h3>📝 Recent Visits (${data.count}):</h3><div class="visits-list">`;
+                
+                data.visits.forEach(visit => {
+                    html += `
+                        <div class="visit-item">
+                            <strong>#${visit.id}</strong> - ${visit.endpoint} 
+                            <br><small>${visit.timestamp}</small>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                document.getElementById('visits').innerHTML = html;
+                document.getElementById('visits').style.display = 'block';
+            } catch (error) {
+                document.getElementById('visits').innerHTML = 
+                    `<p style="color: #ff6b6b;">❌ Error: ${error.message}</p>`;
             }
         }
     </script>
